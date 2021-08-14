@@ -1,16 +1,30 @@
 const http = require("http");
-const users = require("./data/users.json");
 
-console.log("DATA BEFORE STRINGIFY", users);
+const {
+  getUsers,
+  getUser,
+  createUser,
+} = require("./controllers/userController");
 
 const hostname = "127.0.0.1";
 const port = 3000;
 
 const server = http.createServer((req, res) => {
-  //   res.statusCode = 200;
-  //   res.setHeader("Content-Type", "text/plain");
-  res.writeHead(200, { "Content-Type": "application/json" });
-  res.end(JSON.stringify(users));
+  // res.statusCode = 200;
+  // res.setHeader("Content-Type", "text/plain");
+  if (req.url === "/api/users" && req.method === "GET") {
+    //getUsers
+    getUsers(req, res);
+  } else if (req.url.match(/\/api\/users\/([0-9]+)/) && req.method === "GET") {
+    //getUser(req, res, id);
+    let id = req.url.split("/")[3];
+    getUser(req, res, id);
+  } else if (req.url === "/api/users" && req.method === "POST") {
+    createUser(req, res);
+  } else {
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify("Route not found"));
+  }
 });
 
 server.listen(port, hostname, () => {
