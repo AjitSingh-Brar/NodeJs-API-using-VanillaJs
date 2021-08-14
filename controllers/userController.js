@@ -28,7 +28,7 @@ async function createUser(req, res) {
       username: "testy",
     };
 
-    const newUser = User.create(user);
+    const newUser = await User.create(user);
     res.writeHead(201, { "Content-Type": "application/json" });
     res.end(JSON.stringify(newUser));
   } catch (err) {
