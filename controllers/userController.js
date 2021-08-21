@@ -1,4 +1,5 @@
 const User = require("../model/userModels");
+const { getPostData } = require("../util");
 
 async function getUsers(req, res) {
   try {
@@ -36,8 +37,53 @@ async function createUser(req, res) {
   }
 }
 
+async function updateUser(req, res, id) {
+  try {
+    const user = await User.findByID(id);
+    if (!user) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ Message: "User not found" }));
+    } else {
+      const body = await getPostData(req);
+      const { title, name, username } = JSON.parse(body);
+
+      const userData = {
+        title: title || user.title,
+        name: name || user.name,
+        username: username || user.username,
+      };
+
+      const updatedUser = await User.update(id, userData);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(updatedUser));
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const deleteUser = async (req, res, id) => {
+  try {
+    const user = await User.findByID(id);
+    if (!user) {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ Message: "User not found" }));
+    } else {
+      await User.remove(id);
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ Message: `User at ${id} has been removed` }));
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   getUsers,
   getUser,
   createUser,
+  updateUser,
+  deleteUser,
 };

@@ -1,4 +1,4 @@
-const users = require("../data/users.json");
+let users = require("../data/users.json");
 const { v4: uuidv4 } = require("uuid");
 const { writeDataToFile } = require("../util");
 
@@ -14,7 +14,7 @@ const findAll = () => {
 //route GET  /api/users/2
 const findByID = (id) => {
   return new Promise((resolve, reject) => {
-    const user = users.find((u) => u.id === parseInt(id));
+    const user = users.find((u) => u.id === id);
     resolve(user);
   });
 };
@@ -30,8 +30,27 @@ const create = (user) => {
   });
 };
 
+const update = (id, user) => {
+  return new Promise((resolve, reject) => {
+    const index = users.findIndex((u) => u.id === id);
+    users[index] = { id, ...user };
+    writeDataToFile("./data/users.json", users);
+    resolve(users[index]);
+  });
+};
+
+const remove = (id) => {
+  return new Promise((resolve, reject) => {
+    users = users.filter((user) => user.id === id);
+    writeDataToFile("./data/users.json", users);
+    resolve();
+  });
+};
+
 module.exports = {
   findAll,
   findByID,
   create,
+  update,
+  remove,
 };
